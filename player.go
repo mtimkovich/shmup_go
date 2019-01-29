@@ -2,11 +2,9 @@ package main
 
 import (
 	_ "image/png"
-	"log"
 
 	"github.com/Bredgren/geo"
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 const (
@@ -29,13 +27,8 @@ type Player struct {
 }
 
 func NewPlayer() *Player {
-	var err error
 	p := &Player{}
-	// TODO: Load image during startup
-	p.img, _, err = ebitenutil.NewImageFromFile("img/ship.png", ebiten.FilterDefault)
-	if err != nil {
-		log.Fatal(err)
-	}
+	p.img = SHIP_PNG
 	size := geo.VecXYi(p.img.Size())
 	p.rect = geo.RectWH(size.XY())
 
