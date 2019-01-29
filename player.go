@@ -14,23 +14,24 @@ const (
 	Y_BUFFER = 10
 )
 
+// Padding around the screen
 var PlayerArea geo.Rect = geo.RectXYWH(
-	float64(X_BUFFER),
-	float64(Y_BUFFER),
-	float64(SCREEN_WIDTH-X_BUFFER*2),
-	float64(SCREEN_HEIGHT-Y_BUFFER*2),
+	X_BUFFER,
+	Y_BUFFER,
+	SCREEN_WIDTH-X_BUFFER*2,
+	SCREEN_HEIGHT-Y_BUFFER*2,
 )
 
 type Player struct {
-	x    float64
-	y    float64
-	img  *ebiten.Image
-	rect geo.Rect
+	img   *ebiten.Image
+	rect  geo.Rect
+	index int
 }
 
 func NewPlayer() *Player {
 	var err error
 	p := &Player{}
+	// TODO: Load image during startup
 	p.img, _, err = ebitenutil.NewImageFromFile("img/ship.png", ebiten.FilterDefault)
 	if err != nil {
 		log.Fatal(err)
@@ -41,15 +42,25 @@ func NewPlayer() *Player {
 	return p
 }
 
+// func (p *Player) shoot() {
+// 	AddToDrawables(NewMissile(p.rect.TopMid))
+// }
+
+func (p *Player) Index(i int) {
+	p.index = i
+}
+
 func (p *Player) Update() {
 	// TODO: TouchPosition
 	x, _ := ebiten.CursorPosition()
 	p.rect.SetMid(float64(x), SCREEN_HEIGHT)
 	p.rect.Clamp(PlayerArea)
+
+	// p.shoot()
 }
 
-func (p *Player) Draw(screen *ebiten.Image) {
+func (p *Player) Draw(dst *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(p.rect.TopLeft())
-	screen.DrawImage(p.img, op)
+	dst.DrawImage(p.img, op)
 }
