@@ -27,7 +27,7 @@ func (m *Missile) Update() error {
 	_, dy := m.rect.Size()
 	m.rect.Move(0, -dy-2)
 
-	if !ScreenRect.Contains(m.rect) {
+	if !m.rect.CollideRect(ScreenRect) {
 		delete(Drawables, m)
 		return fmt.Errorf("missile offscreen")
 	}
