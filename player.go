@@ -1,8 +1,6 @@
 package main
 
 import (
-	_ "image/png"
-
 	"github.com/Bredgren/geo"
 	"github.com/hajimehoshi/ebiten"
 )
@@ -21,35 +19,33 @@ var PlayerArea geo.Rect = geo.RectXYWH(
 )
 
 type Player struct {
-	img   *ebiten.Image
-	rect  geo.Rect
-	index int
+	img  *ebiten.Image
+	rect geo.Rect
 }
 
 func NewPlayer() *Player {
-	p := &Player{}
-	p.img = SHIP_PNG
+	p := &Player{
+		img: SHIP_PNG,
+	}
 	size := geo.VecXYi(p.img.Size())
 	p.rect = geo.RectWH(size.XY())
 
 	return p
 }
 
-// func (p *Player) shoot() {
-// 	AddToDrawables(NewMissile(p.rect.TopMid))
-// }
-
-func (p *Player) Index(i int) {
-	p.index = i
+func (p *Player) shoot() {
+	Drawables[NewMissile(p.rect.TopMid())] = true
 }
 
-func (p *Player) Update() {
+func (p *Player) Update() error {
 	// TODO: TouchPosition
 	x, _ := ebiten.CursorPosition()
 	p.rect.SetMid(float64(x), SCREEN_HEIGHT)
 	p.rect.Clamp(PlayerArea)
 
-	// p.shoot()
+	p.shoot()
+
+	return nil
 }
 
 func (p *Player) Draw(dst *ebiten.Image) {

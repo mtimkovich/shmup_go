@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
-// A 16x9 resolution to mimic a smartphone (or an arcade cabinet).
+// A 16x9 resolution to mimic Drawables smartphone (or an arcade cabinet).
 const (
 	SCREEN_WIDTH  = 240
 	SCREEN_HEIGHT = 426
@@ -20,18 +20,13 @@ var (
 	MISSILE_PNG *ebiten.Image
 )
 
+// Loop through Drawable objects to write to the screen.
 type Drawable interface {
-	Update()
+	Update() error
 	Draw(*ebiten.Image)
-	Index(int) // Set the location of the object in the drawable list
 }
 
-var Drawables []Drawable
-
-func AddToDrawables(d Drawable) {
-	Drawables = append(Drawables, d)
-	d.Index(len(Drawables) - 1)
-}
+var Drawables map[Drawable]bool
 
 type Game struct {
 	Title  string
@@ -44,7 +39,9 @@ func NewGame() *Game {
 		Player: NewPlayer(),
 	}
 
-	AddToDrawables(g.Player)
+	Drawables = map[Drawable]bool{
+		g.Player: true,
+	}
 
 	return g
 }
@@ -54,9 +51,12 @@ func (g *Game) Update(screen *ebiten.Image) error {
 		return nil
 	}
 
-	for _, d := range Drawables {
-		d.Update()
-		d.Draw(screen)
+	for d, _ := range Drawables {
+		err := d.Update()
+
+		if err == nil {
+			d.Draw(screen)
+		}
 	}
 
 	return nil
@@ -72,6 +72,7 @@ func loadImage(path string) *ebiten.Image {
 }
 
 func init() {
+	// Load resources into memory
 	SHIP_PNG = loadImage("img/ship.png")
 	MISSILE_PNG = loadImage("img/missile.png")
 }
