@@ -11,16 +11,16 @@ const (
 )
 
 // Padding around the screen
-var PlayerArea geo.Rect = geo.RectXYWH(
+var PlayerArea geo.Rect = geo.RectCorners(
 	X_BUFFER,
 	Y_BUFFER,
-	SCREEN_WIDTH-X_BUFFER*2,
-	SCREEN_HEIGHT-Y_BUFFER*2,
+	SCREEN_WIDTH-X_BUFFER,
+	SCREEN_HEIGHT-Y_BUFFER,
 )
 
 type Player struct {
-	img  *ebiten.Image
-	rect geo.Rect
+	img *ebiten.Image
+	box geo.Rect
 }
 
 func NewPlayer() *Player {
@@ -28,28 +28,29 @@ func NewPlayer() *Player {
 		img: SHIP_PNG,
 	}
 	size := geo.VecXYi(p.img.Size())
-	p.rect = geo.RectWH(size.XY())
+	p.box = geo.RectWH(size.XY())
 
 	return p
 }
 
-func (p *Player) shoot() {
-	Drawables[NewMissile(p.rect.TopMid())] = true
+// Create a new missile and add it to the drawable map.
+func (p *Player) Shoot() {
+	Drawables[NewMissile(p.box.TopMid())] = true
 }
 
 func (p *Player) Update() error {
 	// TODO: TouchPosition
 	x, _ := ebiten.CursorPosition()
-	p.rect.SetMid(float64(x), SCREEN_HEIGHT)
-	p.rect.Clamp(PlayerArea)
+	p.box.SetMid(float64(x), SCREEN_HEIGHT)
+	p.box.Clamp(PlayerArea)
 
-	p.shoot()
+	p.Shoot()
 
 	return nil
 }
 
 func (p *Player) Draw(dst *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(p.rect.TopLeft())
+	op.GeoM.Translate(p.box.TopLeft())
 	dst.DrawImage(p.img, op)
 }

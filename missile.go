@@ -8,8 +8,8 @@ import (
 )
 
 type Missile struct {
-	img  *ebiten.Image
-	rect geo.Rect
+	img *ebiten.Image
+	box geo.Rect
 }
 
 func NewMissile(x, y float64) *Missile {
@@ -17,17 +17,16 @@ func NewMissile(x, y float64) *Missile {
 		img: MISSILE_PNG,
 	}
 	size := geo.VecXYi(m.img.Size())
-	m.rect = geo.RectWH(size.XY())
-	m.rect.SetMid(x, y)
+	m.box = geo.RectWH(size.XY())
+	m.box.SetMid(x, y)
 
 	return m
 }
 
 func (m *Missile) Update() error {
-	_, dy := m.rect.Size()
-	m.rect.Move(0, -dy-2)
+	m.box.Move(0, -m.box.H-2)
 
-	if !m.rect.CollideRect(ScreenRect) {
+	if !m.box.CollideRect(ScreenRect) {
 		delete(Drawables, m)
 		return fmt.Errorf("missile offscreen")
 	}
@@ -37,6 +36,6 @@ func (m *Missile) Update() error {
 
 func (m *Missile) Draw(dst *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(m.rect.TopLeft())
+	op.GeoM.Translate(m.box.TopLeft())
 	dst.DrawImage(m.img, op)
 }
