@@ -7,7 +7,6 @@ import (
 
 	"golang.org/x/image/font"
 
-	"github.com/Bredgren/geo"
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -17,13 +16,13 @@ import (
 
 // A 16x9 resolution to mimic Drawables smartphone (or an arcade cabinet).
 const (
+	TITLE         = "shmup"
 	SCREEN_WIDTH  = 240
 	SCREEN_HEIGHT = 426
 	FONT_SIZE     = 8
 )
 
 var (
-	ScreenRect  geo.Rect = geo.RectWH(SCREEN_WIDTH, SCREEN_HEIGHT)
 	SHIP_PNG    *ebiten.Image
 	MISSILE_PNG *ebiten.Image
 	Score       int
@@ -38,25 +37,7 @@ type Drawable interface {
 
 var Drawables map[Drawable]bool
 
-type Game struct {
-	Title  string
-	Player *Player
-}
-
-func NewGame() *Game {
-	g := &Game{
-		Title:  "shmup",
-		Player: NewPlayer(),
-	}
-
-	Drawables = map[Drawable]bool{
-		g.Player: true,
-	}
-
-	return g
-}
-
-func (g *Game) Update(screen *ebiten.Image) error {
+func update(screen *ebiten.Image) error {
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
@@ -103,8 +84,11 @@ func init() {
 }
 
 func main() {
-	g := NewGame()
-	if err := ebiten.Run(g.Update, SCREEN_WIDTH, SCREEN_HEIGHT, 2, g.Title); err != nil {
+	Drawables = map[Drawable]bool{
+		NewPlayer(): true,
+	}
+
+	if err := ebiten.Run(update, SCREEN_WIDTH, SCREEN_HEIGHT, 2, TITLE); err != nil {
 		log.Fatal(err)
 	}
 }

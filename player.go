@@ -21,7 +21,7 @@ var PlayerArea geo.Rect = geo.RectCorners(
 type Player struct {
 	img  *ebiten.Image
 	box  geo.Rect
-	shot bool
+	tick int
 }
 
 func NewPlayer() *Player {
@@ -34,9 +34,18 @@ func NewPlayer() *Player {
 	return p
 }
 
-// Create a new missile and add it to the drawable map.
+// Create 2 new missiles and add them to the drawable map.
 func (p *Player) Shoot() {
-	Drawables[NewMissile(p.box.TopMid())] = true
+	// Shoot every n frames.
+	p.tick = (p.tick + 1) % 4
+
+	if p.tick != 0 {
+		return
+	}
+
+	x, y := p.box.Mid()
+	Drawables[NewMissile(x-4, y)] = true
+	Drawables[NewMissile(x+4, y)] = true
 	Score++
 }
 
@@ -45,13 +54,7 @@ func (p *Player) Update() error {
 	x, _ := ebiten.CursorPosition()
 	p.box.SetMid(float64(x), SCREEN_HEIGHT)
 	p.box.Clamp(PlayerArea)
-
-	if p.shot {
-		p.shot = false
-	} else {
-		p.Shoot()
-		p.shot = true
-	}
+	p.Shoot()
 
 	return nil
 }

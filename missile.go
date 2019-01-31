@@ -24,7 +24,7 @@ func NewMissile(x, y float64) *Missile {
 }
 
 func (m *Missile) Update() error {
-	distance := m.box.H + 2
+	distance := m.box.H - 2
 	m.box.Move(0, -distance)
 
 	if !m.box.CollideRect(PlayerArea) {
