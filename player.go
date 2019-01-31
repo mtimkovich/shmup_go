@@ -13,14 +13,15 @@ const (
 // Padding around the screen
 var PlayerArea geo.Rect = geo.RectCorners(
 	X_BUFFER,
-	Y_BUFFER,
+	Y_BUFFER*2,
 	SCREEN_WIDTH-X_BUFFER,
 	SCREEN_HEIGHT-Y_BUFFER,
 )
 
 type Player struct {
-	img *ebiten.Image
-	box geo.Rect
+	img  *ebiten.Image
+	box  geo.Rect
+	shot bool
 }
 
 func NewPlayer() *Player {
@@ -36,6 +37,7 @@ func NewPlayer() *Player {
 // Create a new missile and add it to the drawable map.
 func (p *Player) Shoot() {
 	Drawables[NewMissile(p.box.TopMid())] = true
+	Score++
 }
 
 func (p *Player) Update() error {
@@ -44,7 +46,12 @@ func (p *Player) Update() error {
 	p.box.SetMid(float64(x), SCREEN_HEIGHT)
 	p.box.Clamp(PlayerArea)
 
-	p.Shoot()
+	if p.shot {
+		p.shot = false
+	} else {
+		p.Shoot()
+		p.shot = true
+	}
 
 	return nil
 }
