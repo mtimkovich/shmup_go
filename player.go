@@ -6,16 +6,15 @@ import (
 )
 
 const (
-	X_BUFFER = 5
-	Y_BUFFER = 10
+	BUFFER = 5
 )
 
 // Padding around the screen
 var PlayerArea geo.Rect = geo.RectCorners(
-	X_BUFFER,
-	Y_BUFFER*2,
-	SCREEN_WIDTH-X_BUFFER,
-	SCREEN_HEIGHT-Y_BUFFER,
+	BUFFER,
+	BUFFER*2,
+	SCREEN_WIDTH-BUFFER,
+	SCREEN_HEIGHT-BUFFER,
 )
 
 type Player struct {

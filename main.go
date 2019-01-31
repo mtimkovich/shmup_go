@@ -14,12 +14,14 @@ import (
 	"github.com/hajimehoshi/ebiten/text"
 )
 
-// A 16x9 resolution to mimic Drawables smartphone (or an arcade cabinet).
 const (
-	TITLE         = "shmup"
-	SCREEN_WIDTH  = 240
-	SCREEN_HEIGHT = 426
+	TITLE = "shmup"
+	// A 16x9 resolution to mimic Drawables smartphone (or an arcade cabinet).
+	SCREEN_WIDTH  = 243
+	SCREEN_HEIGHT = 432
 	FONT_SIZE     = 8
+	TEXT_ROW1     = FONT_SIZE + 5
+	TEXT_ROW2     = FONT_SIZE*2 + 5
 )
 
 var (
@@ -27,6 +29,7 @@ var (
 	MISSILE_PNG *ebiten.Image
 	Score       int
 	arcadeFont  font.Face
+	RED         color.RGBA = color.RGBA{0xff, 0, 0, 0xff}
 )
 
 // Loop through Drawable objects to write to the screen.
@@ -44,8 +47,9 @@ func update(screen *ebiten.Image) error {
 
 	// Draw the score
 	scoreStr := fmt.Sprintf("%02d", Score)
-	scoreBuffer := 5
-	text.Draw(screen, scoreStr, arcadeFont, scoreBuffer, FONT_SIZE+scoreBuffer, color.White)
+	text.Draw(screen, "1UP", arcadeFont, FONT_SIZE*3, TEXT_ROW1, RED)
+	// TODO: This'll break if score is longer than 7 characters.
+	text.Draw(screen, scoreStr, arcadeFont, FONT_SIZE*(7-len(scoreStr)), TEXT_ROW2, color.White)
 
 	for d := range Drawables {
 		err := d.Update()
