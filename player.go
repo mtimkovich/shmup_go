@@ -37,7 +37,7 @@ func NewPlayer() *Player {
 // Create 2 new missiles and add them to the drawable map.
 func (p *Player) Shoot() {
 	// Shoot every n frames.
-	p.tick = (p.tick + 1) % 4
+	p.tick = (p.tick + 1) % 2
 
 	if p.tick != 0 {
 		return
