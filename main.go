@@ -45,12 +45,6 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
-	// Draw the score
-	scoreStr := fmt.Sprintf("%02d", Score)
-	text.Draw(screen, "1UP", arcadeFont, FONT_SIZE*3, TEXT_ROW1, RED)
-	// TODO: This'll break if score is longer than 7 characters.
-	text.Draw(screen, scoreStr, arcadeFont, FONT_SIZE*(7-len(scoreStr)), TEXT_ROW2, color.White)
-
 	for d := range Drawables {
 		err := d.Update()
 
@@ -58,6 +52,12 @@ func update(screen *ebiten.Image) error {
 			d.Draw(screen)
 		}
 	}
+
+	// Draw the score
+	scoreStr := fmt.Sprintf("%02d", Score)
+	text.Draw(screen, "1UP", arcadeFont, FONT_SIZE*3, TEXT_ROW1, RED)
+	// TODO: This'll break if score is longer than 7 characters.
+	text.Draw(screen, scoreStr, arcadeFont, FONT_SIZE*(7-len(scoreStr)), TEXT_ROW2, color.White)
 
 	return nil
 }
