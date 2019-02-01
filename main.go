@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/gif"
 	"log"
 
 	"golang.org/x/image/colornames"
@@ -28,10 +29,12 @@ const (
 var (
 	SHIP_PNG    *ebiten.Image
 	MISSILE_PNG *ebiten.Image
-	STAR_FIELD  *ebiten.Image
+	STAR_FIELD  *gif.GIF
 	ScreenRect  geo.Rect = geo.RectWH(SCREEN_WIDTH, SCREEN_HEIGHT)
 	Score       int
 	arcadeFont  font.Face
+	tick        int
+	bgCount     int
 )
 
 // Loop through Drawable objects to write to the screen.
@@ -42,16 +45,27 @@ type Drawable interface {
 
 var Drawables map[Drawable]bool
 
-// Fill screen with tiling background image.
-func fillBG(dst *ebiten.Image, bg *ebiten.Image) {
-	sizeX, sizeY := geo.VecXYi(bg.Size()).XY()
+// Fill screen with tiling background GIF.
+func fillBG(dst *ebiten.Image, bg *gif.GIF) {
+	bgFrame, err := ebiten.NewImageFromImage(bg.Image[bgCount], ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if tick == 0 {
+		bgCount = (bgCount + 1) % len(bg.Image)
+	}
+
+	tick = (tick + 1) % bg.Delay[bgCount]
+
+	sizeX, sizeY := geo.VecXYi(bgFrame.Size()).XY()
 	var width, height float64
 	opts := &ebiten.DrawImageOptions{}
 
 	for height < SCREEN_HEIGHT {
 		for width < SCREEN_WIDTH {
 			opts.GeoM.Translate(width, height)
-			dst.DrawImage(bg, opts)
+			dst.DrawImage(bgFrame, opts)
 			width += sizeX
 		}
 
@@ -96,11 +110,26 @@ func loadImage(path string) *ebiten.Image {
 	return img
 }
 
+func loadGIF(path string) *gif.GIF {
+	file, err := ebitenutil.OpenFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	img, err := gif.DecodeAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return img
+}
+
 func init() {
 	// Load resources into memory
 	SHIP_PNG = loadImage("img/ship.png")
 	MISSILE_PNG = loadImage("img/missile.png")
-	STAR_FIELD = loadImage("img/starfield.gif")
+	STAR_FIELD = loadGIF("img/starfield.gif")
 
 	tt, err := truetype.Parse(fonts.ArcadeN_ttf)
 	if err != nil {
