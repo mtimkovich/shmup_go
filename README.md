@@ -2,6 +2,8 @@
 
 A shmup game in Go using [Ebiten][ebiten].
 
+![Screenshot][screenshot]
+
 ## TODO
 - [x] Player
 - [x] Missiles
@@ -20,4 +22,6 @@ A shmup game in Go using [Ebiten][ebiten].
 - [Background image by ASDFGHJKLDQREW][bg]
 
 [ebiten]: https://hajimehoshi.github.io/ebiten/
+[screenshot]:
+https://raw.githubusercontent.com/mtimkovich/shmup/master/img/screenshot.png
 [bg]: https://www.deviantart.com/asdfghjkldqrew/art/Space-743777252

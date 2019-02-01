@@ -29,6 +29,7 @@ var (
 	SHIP_PNG    *ebiten.Image
 	MISSILE_PNG *ebiten.Image
 	STAR_FIELD  *ebiten.Image
+	ScreenRect  geo.Rect = geo.RectWH(SCREEN_WIDTH, SCREEN_HEIGHT)
 	Score       int
 	arcadeFont  font.Face
 )

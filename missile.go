@@ -27,7 +27,7 @@ func (m *Missile) Update() error {
 	distance := m.box.H - 2
 	m.box.Move(0, -distance)
 
-	if !m.box.CollideRect(PlayerArea) {
+	if !m.box.CollideRect(ScreenRect) {
 		delete(Drawables, m)
 		return fmt.Errorf("missile offscreen")
 	}
