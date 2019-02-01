@@ -47,10 +47,7 @@ var Drawables map[Drawable]bool
 
 // Fill screen with tiling background GIF.
 func fillBG(dst *ebiten.Image, bg *gif.GIF) {
-	bgFrame, err := ebiten.NewImageFromImage(bg.Image[bgCount], ebiten.FilterDefault)
-	if err != nil {
-		log.Fatal(err)
-	}
+	bgFrame, _ := ebiten.NewImageFromImage(bg.Image[bgCount], ebiten.FilterDefault)
 
 	if tick == 0 {
 		bgCount = (bgCount + 1) % len(bg.Image)
