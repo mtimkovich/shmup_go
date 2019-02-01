@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	"log"
 
+	"golang.org/x/image/colornames"
 	"golang.org/x/image/font"
 
+	"github.com/Bredgren/geo"
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -27,9 +28,9 @@ const (
 var (
 	SHIP_PNG    *ebiten.Image
 	MISSILE_PNG *ebiten.Image
+	STAR_FIELD  *ebiten.Image
 	Score       int
 	arcadeFont  font.Face
-	RED         color.RGBA = color.RGBA{0xff, 0, 0, 0xff}
 )
 
 // Loop through Drawable objects to write to the screen.
@@ -40,10 +41,37 @@ type Drawable interface {
 
 var Drawables map[Drawable]bool
 
+// Fill screen with tiling background image.
+func fillBG(dst *ebiten.Image, bg *ebiten.Image) {
+	sizeX, sizeY := geo.VecXYi(bg.Size()).XY()
+	var width, height float64
+	opts := &ebiten.DrawImageOptions{}
+
+	for height < SCREEN_HEIGHT {
+		for width < SCREEN_WIDTH {
+			opts.GeoM.Translate(width, height)
+			dst.DrawImage(bg, opts)
+			width += sizeX
+		}
+
+		width = 0
+		height += sizeY
+	}
+}
+
+func drawScore(dst *ebiten.Image) {
+	scoreStr := fmt.Sprintf("%02d", Score)
+	text.Draw(dst, "1UP", arcadeFont, FONT_SIZE*3, TEXT_ROW1, colornames.Red)
+	// TODO: This'll break if score is longer than 7 characters.
+	text.Draw(dst, scoreStr, arcadeFont, FONT_SIZE*(7-len(scoreStr)), TEXT_ROW2, colornames.White)
+}
+
 func update(screen *ebiten.Image) error {
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
+
+	fillBG(screen, STAR_FIELD)
 
 	for d := range Drawables {
 		err := d.Update()
@@ -53,11 +81,7 @@ func update(screen *ebiten.Image) error {
 		}
 	}
 
-	// Draw the score
-	scoreStr := fmt.Sprintf("%02d", Score)
-	text.Draw(screen, "1UP", arcadeFont, FONT_SIZE*3, TEXT_ROW1, RED)
-	// TODO: This'll break if score is longer than 7 characters.
-	text.Draw(screen, scoreStr, arcadeFont, FONT_SIZE*(7-len(scoreStr)), TEXT_ROW2, color.White)
+	drawScore(screen)
 
 	return nil
 }
@@ -75,6 +99,7 @@ func init() {
 	// Load resources into memory
 	SHIP_PNG = loadImage("img/ship.png")
 	MISSILE_PNG = loadImage("img/missile.png")
+	STAR_FIELD = loadImage("img/starfield.gif")
 
 	tt, err := truetype.Parse(fonts.ArcadeN_ttf)
 	if err != nil {
