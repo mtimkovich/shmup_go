@@ -18,7 +18,7 @@ import (
 
 const (
 	TITLE = "shmup"
-	// A 16x9 resolution to mimic Drawables smartphone (or an arcade cabinet).
+	// A 16x9 resolution to mimic a smartphone (or an arcade cabinet).
 	SCREEN_WIDTH  = 243
 	SCREEN_HEIGHT = 432
 	FONT_SIZE     = 8
