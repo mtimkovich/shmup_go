@@ -33,8 +33,7 @@ var (
 	ScreenRect  geo.Rect = geo.RectWH(SCREEN_WIDTH, SCREEN_HEIGHT)
 	Score       int
 	arcadeFont  font.Face
-	tick        int
-	bgCount     int
+	background  *Background
 )
 
 // Loop through Drawable objects to write to the screen.
@@ -44,32 +43,6 @@ type Drawable interface {
 }
 
 var Drawables map[Drawable]bool
-
-// Fill screen with tiling background GIF.
-func fillBG(dst *ebiten.Image, bg *gif.GIF) {
-	bgFrame, _ := ebiten.NewImageFromImage(bg.Image[bgCount], ebiten.FilterDefault)
-
-	if tick == 0 {
-		bgCount = (bgCount + 1) % len(bg.Image)
-	}
-
-	tick = (tick + 1) % bg.Delay[bgCount]
-
-	sizeX, sizeY := geo.VecXYi(bgFrame.Size()).XY()
-	var width, height float64
-	opts := &ebiten.DrawImageOptions{}
-
-	for height < SCREEN_HEIGHT {
-		for width < SCREEN_WIDTH {
-			opts.GeoM.Translate(width, height)
-			dst.DrawImage(bgFrame, opts)
-			width += sizeX
-		}
-
-		width = 0
-		height += sizeY
-	}
-}
 
 func drawScore(dst *ebiten.Image) {
 	scoreStr := fmt.Sprintf("%02d", Score)
@@ -83,7 +56,7 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
-	fillBG(screen, STAR_FIELD)
+	background.UpdateAndDraw(screen)
 
 	for d := range Drawables {
 		err := d.Update()
@@ -140,6 +113,7 @@ func init() {
 }
 
 func main() {
+	background = &Background{img: STAR_FIELD}
 	Drawables = map[Drawable]bool{
 		NewPlayer(): true,
 	}
